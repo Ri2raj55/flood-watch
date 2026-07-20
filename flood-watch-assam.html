@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flood Watch — Community Reports</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --indigo-deep:#101d33;
+    --indigo-mid:#1c2f4e;
+    --silt-brown:#8a6a44;
+    --amber:#e0a53d;
+    --alert-red:#c1443c;
+    --paper:#f3efe4;
+    --paper-dim:#e7e1d1;
+    --ink:#182231;
+    --ink-soft:#5a6478;
+    --line:#d8d0ba;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+  }
+  .mono{ font-family:'IBM Plex Mono',monospace; letter-spacing:0.02em; }
+  .display{ font-family:'Fraunces',serif; }
+
+  /* ---------- HEADER ---------- */
+  header{
+    position:sticky; top:0; z-index:50;
+    background:var(--indigo-deep);
+    color:var(--paper);
+    padding:14px 24px;
+    display:flex; justify-content:space-between; align-items:center;
+    border-bottom:2px solid var(--amber);
+  }
+  header .tag{
+    font-size:11px; text-transform:uppercase;
+    color:var(--amber);
+  }
+  header .brand{ font-size:15px; font-weight:600; }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    display:grid;
+    grid-template-columns:1.1fr 0.9fr;
+    gap:40px;
+    padding:64px 48px 56px;
+    background:linear-gradient(180deg,var(--indigo-deep) 0%, var(--indigo-mid) 100%);
+    color:var(--paper);
+    overflow:hidden;
+    position:relative;
+  }
+  .hero-copy h1{
+    font-size:clamp(34px,5vw,58px);
+    font-weight:600;
+    line-height:1.05;
+    margin-bottom:18px;
+  }
+  .hero-copy h1 em{ font-style:normal; color:var(--amber); }
+  .hero-copy p{
+    max-width:480px; color:#c9d1e0; font-size:16px; margin-bottom:28px;
+  }
+  .hero-copy .stats{
+    display:flex; gap:28px; margin-top:8px;
+  }
+  .hero-copy .stat b{
+    display:block; font-family:'Fraunces',serif; font-size:26px; color:var(--amber);
+  }
+  .hero-copy .stat span{
+    font-size:11px; text-transform:uppercase; color:#93a0b8; letter-spacing:0.04em;
+  }
+  .cta-btn{
+    background:var(--amber); color:var(--indigo-deep); border:none;
+    padding:13px 26px; font-weight:600; border-radius:3px; cursor:pointer;
+    font-size:14px; margin-top:26px;
+  }
+  .cta-btn:hover{ background:#eeb85c; }
+
+  /* signature: live community gauge */
+  .gauge-wrap{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    position:relative;
+  }
+  .gauge-label{
+    font-size:11px; text-transform:uppercase; color:#93a0b8; margin-bottom:10px; letter-spacing:0.06em;
+  }
+  .gauge{
+    width:150px; height:280px;
+    border:2px solid #3a4a68;
+    border-radius:6px;
+    position:relative;
+    overflow:hidden;
+    background:#0c1526;
+  }
+  .gauge-water{
+    position:absolute; bottom:0; left:0; width:100%;
+    background:linear-gradient(180deg, #4a6fa5 0%, var(--silt-brown) 100%);
+    transition:height 1.2s ease;
+    height:8%;
+  }
+  .gauge-water::before{
+    content:''; position:absolute; top:-6px; left:0; width:200%; height:12px;
+    background:repeating-linear-gradient(90deg, rgba(255,255,255,0.25) 0 20px, transparent 20px 40px);
+    animation:wave 3s linear infinite;
+  }
+  @keyframes wave{ from{transform:translateX(0);} to{transform:translateX(-40px);} }
+  .gauge-ticks{
+    position:absolute; inset:0; display:flex; flex-direction:column; justify-content:space-between;
+    padding:10px 0;
+  }
+  .gauge-ticks div{
+    border-top:1px dashed #2c3b58; font-size:9px; color:#5f6f8f; padding-left:6px;
+    font-family:'IBM Plex Mono',monospace;
+  }
+  .gauge-reading{
+    margin-top:12px; font-size:13px; color:var(--paper); text-align:center;
+  }
+  .gauge-reading b{ color:var(--amber); }
+
+  /* ---------- FORM SECTION ---------- */
+  .form-section{
+    padding:60px 48px;
+    max-width:920px; margin:0 auto;
+  }
+  .section-eyebrow{
+    font-size:11px; text-transform:uppercase; color:var(--silt-brown);
+    letter-spacing:0.08em; margin-bottom:8px;
+  }
+  .section-title{
+    font-family:'Fraunces',serif; font-size:30px; margin-bottom:6px; font-weight:600;
+  }
+  .section-sub{ color:var(--ink-soft); margin-bottom:32px; font-size:14.5px; max-width:560px; }
+
+  form{
+    background:#fff; border:1px solid var(--line); border-radius:6px; padding:32px;
+  }
+  .form-grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:24px;
+  }
+  .field{ display:flex; flex-direction:column; gap:8px; }
+  .field.full{ grid-column:1/-1; }
+  label{ font-size:12px; text-transform:uppercase; letter-spacing:0.04em; color:var(--ink-soft); font-weight:600; }
+  input[type=text], textarea{
+    border:1px solid var(--line); border-radius:4px; padding:11px 12px;
+    font-family:'Inter',sans-serif; font-size:14px; background:var(--paper);
+    color:var(--ink);
+  }
+  textarea{ resize:vertical; min-height:80px; }
+  input:focus, textarea:focus{ outline:2px solid var(--silt-brown); outline-offset:1px; }
+
+  .loc-row{ display:flex; gap:8px; }
+  .loc-row input{ flex:1; }
+  .gps-btn{
+    border:1px solid var(--silt-brown); background:none; color:var(--silt-brown);
+    border-radius:4px; padding:0 14px; font-size:12px; cursor:pointer; white-space:nowrap;
+  }
+  .gps-btn:hover{ background:var(--silt-brown); color:#fff; }
+
+  /* photo capture tile */
+  .photo-tile{
+    border:2px dashed var(--line); border-radius:6px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:22px; cursor:pointer; text-align:center; min-height:150px;
+    background:var(--paper); position:relative; overflow:hidden;
+  }
+  .photo-tile img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .photo-tile .hint{ font-size:12.5px; color:var(--ink-soft); }
+  .photo-tile .icon{ font-size:26px; margin-bottom:8px; }
+  .photo-tile input{ display:none; }
+
+  /* severity ruler - signature control */
+  .severity-options{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:10px;
+  }
+  .sev-btn{
+    border:1px solid var(--line); border-radius:4px; background:#fff;
+    padding:12px 6px 10px; cursor:pointer; text-align:center;
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+  }
+  .sev-fill-track{ width:14px; height:34px; border:1px solid var(--line); border-radius:2px; position:relative; overflow:hidden; background:var(--paper-dim);}
+  .sev-fill{ position:absolute; bottom:0; left:0; width:100%; }
+  .sev-btn span{ font-size:10.5px; color:var(--ink-soft); line-height:1.2; }
+  .sev-btn.active{ border-color:var(--ink); box-shadow:0 0 0 1px var(--ink); }
+  .sev-btn.active span{ color:var(--ink); font-weight:600; }
+
+  .submit-row{ display:flex; justify-content:flex-end; margin-top:26px; align-items:center; gap:14px;}
+  .submit-status{ font-size:12.5px; color:var(--ink-soft); }
+  .submit-btn{
+    background:var(--indigo-deep); color:#fff; border:none; padding:13px 28px;
+    border-radius:4px; font-weight:600; cursor:pointer; font-size:14px;
+  }
+  .submit-btn:hover{ background:#0b1729; }
+  .submit-btn:disabled{ opacity:0.5; cursor:not-allowed; }
+
+  /* ---------- FEED ---------- */
+  .feed-section{
+    background:var(--indigo-deep); color:var(--paper);
+    padding:56px 48px 72px;
+  }
+  .feed-header{ max-width:920px; margin:0 auto 30px; display:flex; justify-content:space-between; align-items:flex-end;}
+  .feed-header .section-title{ color:var(--paper); }
+  .feed-header .section-eyebrow{ color:var(--amber); }
+  .feed-count{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:#93a0b8; }
+
+  .feed-grid{
+    max-width:920px; margin:0 auto;
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:18px;
+  }
+  .report-card{
+    background:var(--indigo-mid); border:1px solid #2c3b58; border-radius:6px; overflow:hidden;
+  }
+  .report-photo{ width:100%; height:150px; object-fit:cover; display:block; background:#0c1526; }
+  .report-body{ padding:14px 16px 16px; }
+  .badge{
+    display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:10.5px;
+    padding:3px 8px; border-radius:20px; text-transform:uppercase; margin-bottom:8px;
+  }
+  .report-loc{ font-size:13.5px; font-weight:600; margin-bottom:4px; }
+  .report-desc{ font-size:12.5px; color:#a9b3c6; margin-bottom:10px; line-height:1.5;}
+  .report-time{ font-size:10.5px; color:#697590; font-family:'IBM Plex Mono',monospace;}
+  .empty-feed{ color:#93a0b8; font-size:13.5px; grid-column:1/-1; text-align:center; padding:40px 0;}
+
+  /* ---------- IDEAS FOOTER ---------- */
+  footer{
+    padding:40px 48px; background:var(--paper); border-top:1px solid var(--line);
+  }
+  .ideas{
+    max-width:920px; margin:0 auto;
+  }
+  .ideas .section-eyebrow{ margin-bottom:4px; }
+  .idea-list{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin-top:18px;}
+  .idea-list div{
+    border:1px solid var(--line); border-radius:4px; padding:14px; font-size:12.5px; color:var(--ink-soft);
+    background:#fff;
+  }
+  .idea-list b{ display:block; color:var(--ink); font-size:13px; margin-bottom:4px; font-family:'Fraunces',serif;}
+
+  @media (max-width:760px){
+    .hero{ grid-template-columns:1fr; padding:44px 20px; }
+    .form-section, .feed-section, footer{ padding-left:20px; padding-right:20px; }
+    .form-grid{ grid-template-columns:1fr; }
+    .severity-options{ grid-template-columns:repeat(2,1fr); }
+    header{ padding:12px 18px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="brand">FLOOD WATCH</div>
+    <div class="tag mono">Assam · community reporting</div>
+  </div>
+  <div class="tag mono" id="clock-tag">LIVE</div>
+</header>
+
+<section class="hero">
+  <div class="hero-copy">
+    <h1>When the water<br>rises, <em>report it</em><br>before it spreads.</h1>
+    <p>A snap of your street corner tells the next family more than any bulletin. Add a photo, mark the water level, and it joins the live community map below — no login, no waiting on the municipal office.</p>
+    <button class="cta-btn" onclick="document.getElementById('report-form').scrollIntoView({behavior:'smooth'})">Report flooding near you</button>
+    <div class="stats">
+      <div class="stat"><b id="stat-count">0</b><span>Reports logged</span></div>
+      <div class="stat"><b id="stat-high">0</b><span>Waist-deep or worse</span></div>
+      <div class="stat"><b id="stat-today">0</b><span>In the last 24h</span></div>
+    </div>
+  </div>
+  <div class="gauge-wrap">
+    <div class="gauge-label mono">Community water gauge</div>
+    <div class="gauge">
+      <div class="gauge-ticks">
+        <div>rooftop</div><div>waist</div><div>knee</div><div>ankle</div>
+      </div>
+      <div class="gauge-water" id="gauge-water"></div>
+    </div>
+    <div class="gauge-reading">Average reported level: <b id="gauge-reading-text">no data yet</b></div>
+  </div>
+</section>
+
+<section class="form-section" id="report-form">
+  <div class="section-eyebrow mono">01 — submit a report</div>
+  <div class="section-title">What's happening at your location?</div>
+  <div class="section-sub">Take a photo where you're standing, mark how deep the water is, and add anything nearby residents should know — a blocked road, a weak embankment, a stranded vehicle.</div>
+
+  <form id="flood-form">
+    <div class="form-grid">
+
+      <div class="field full">
+        <label>Photo</label>
+        <div class="photo-tile" id="photo-tile">
+          <div id="photo-placeholder">
+            <div class="icon">📷</div>
+            <div class="hint">Tap to take or choose a photo</div>
+          </div>
+          <img id="photo-preview" style="display:none;">
+          <input type="file" id="photo-input" accept="image/*" capture="environment">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Location</label>
+        <div class="loc-row">
+          <input type="text" id="location-input" placeholder="e.g. Anil Nagar, near GS Road flyover">
+          <button type="button" class="gps-btn" id="gps-btn">Use GPS</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Your name (optional)</label>
+        <input type="text" id="name-input" placeholder="Anonymous">
+      </div>
+
+      <div class="field full">
+        <label>Water level</label>
+        <div class="severity-options" id="severity-options">
+          <button type="button" class="sev-btn" data-level="1" data-label="Ankle-deep">
+            <div class="sev-fill-track"><div class="sev-fill" style="height:20%;background:#7fae6a;"></div></div>
+            <span>Ankle-deep</span>
+          </button>
+          <button type="button" class="sev-btn" data-level="2" data-label="Knee-deep">
+            <div class="sev-fill-track"><div class="sev-fill" style="height:45%;background:#e0a53d;"></div></div>
+            <span>Knee-deep</span>
+          </button>
+          <button type="button" class="sev-btn" data-level="3" data-label="Waist-deep">
+            <div class="sev-fill-track"><div class="sev-fill" style="height:70%;background:#c1443c;"></div></div>
+            <span>Waist-deep</span>
+          </button>
+          <button type="button" class="sev-btn" data-level="4" data-label="Rooftop / impassable">
+            <div class="sev-fill-track"><div class="sev-fill" style="height:95%;background:#7a1f1a;"></div></div>
+            <span>Rooftop / impassable</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="field full">
+        <label>Details</label>
+        <textarea id="desc-input" placeholder="Blocked roads, stranded vehicles, embankment condition, anything nearby residents should know..."></textarea>
+      </div>
+    </div>
+
+    <div class="submit-row">
+      <div class="submit-status" id="submit-status"></div>
+      <button type="submit" class="submit-btn" id="submit-btn">Submit report</button>
+    </div>
+  </form>
+</section>
+
+<section class="feed-section">
+  <div class="feed-header">
+    <div>
+      <div class="section-eyebrow mono">02 — live feed</div>
+      <div class="section-title">Reports from your neighbours</div>
+    </div>
+    <div class="feed-count mono" id="feed-count">0 reports · shared with everyone viewing this page</div>
+  </div>
+  <div class="feed-grid" id="feed-grid">
+    <div class="empty-feed" id="empty-feed">No reports yet — be the first to log conditions in your area.</div>
+  </div>
+</section>
+
+<footer>
+  <div class="ideas">
+    <div class="section-eyebrow mono">where this could go next</div>
+    <div class="section-title" style="font-size:22px;">Ideas to build on this</div>
+    <div class="idea-list">
+      <div><b>WhatsApp bot</b>Let people submit a report by sending a photo + location pin to a WhatsApp number — no app needed, works on low-end phones.</div>
+      <div><b>Auto severity from photo</b>Run submitted photos through a vision model to flag likely severity, so the map self-corrects if someone under- or over-reports.</div>
+      <div><b>Authority hand-off</b>Auto-email or SMS the district disaster management office when reports cluster in one ward within a short window.</div>
+      <div><b>Heatmap view</b>Plot reports on an actual map (Leaflet + OpenStreetMap) instead of a card grid, so people can see flooding spread street by street.</div>
+      <div><b>SMS fallback</b>For areas with patchy data, a short SMS code (e.g. "FLOOD ANIL NAGAR KNEE") logged the same way as the form.</div>
+      <div><b>Verified badge</b>Let a few trusted local volunteers mark reports as confirmed, so the feed stays reliable during panic spikes.</div>
+    </div>
+  </div>
+</footer>
+
+<script type="module">
+  // ===== FIREBASE SETUP =====
+  // 1. Create a project at https://console.firebase.google.com
+  // 2. Enable Firestore Database (start in test mode)
+  // 3. Project settings > Your apps > Web app > copy the config below
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyALrDyIcZGV-pDOQ-T2c6fWa8ZA7cUA9aI",
+    authDomain: "flood-report-1f69c.firebaseapp.com",
+    projectId: "flood-report-1f69c",
+    storageBucket: "flood-report-1f69c.firebasestorage.app",
+    messagingSenderId: "665170260434",
+    appId: "1:665170260434:web:7726a1ce854027b382180b",
+    measurementId: "G-3RN1KBCGKB"
+  };
+
+  const fbApp = initializeApp(firebaseConfig);
+  const db = getFirestore(fbApp);
+  const reportsCol = collection(db, "flood-reports");
+
+  const SEV_META = {
+    1: {label:'Ankle-deep', color:'#7fae6a'},
+    2: {label:'Knee-deep', color:'#e0a53d'},
+    3: {label:'Waist-deep', color:'#c1443c'},
+    4: {label:'Rooftop / impassable', color:'#7a1f1a'}
+  };
+  const STORAGE_KEY = 'flood-reports';
+
+  let selectedLevel = null;
+  let photoDataUrl = null;
+
+  // ---- severity selection ----
+  document.querySelectorAll('.sev-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.sev-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedLevel = parseInt(btn.dataset.level);
+    });
+  });
+
+  // ---- photo capture + client-side resize ----
+  const photoTile = document.getElementById('photo-tile');
+  const photoInput = document.getElementById('photo-input');
+  photoTile.addEventListener('click', ()=>photoInput.click());
+  photoInput.addEventListener('change', (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev)=>{
+      const img = new Image();
+      img.onload = ()=>{
+        const maxW = 640;
+        const scale = Math.min(1, maxW/img.width);
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width*scale;
+        canvas.height = img.height*scale;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img,0,0,canvas.width,canvas.height);
+        photoDataUrl = canvas.toDataURL('image/jpeg', 0.6);
+        document.getElementById('photo-preview').src = photoDataUrl;
+        document.getElementById('photo-preview').style.display = 'block';
+        document.getElementById('photo-placeholder').style.display = 'none';
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // ---- GPS ----
+  document.getElementById('gps-btn').addEventListener('click', ()=>{
+    if(!navigator.geolocation){
+      alert('Location services are not available in this browser.');
+      return;
+    }
+    const btn = document.getElementById('gps-btn');
+    btn.textContent = 'Locating...';
+    navigator.geolocation.getCurrentPosition(
+      (pos)=>{
+        const lat = pos.coords.latitude.toFixed(4);
+        const lng = pos.coords.longitude.toFixed(4);
+        document.getElementById('location-input').value = `${lat}, ${lng}`;
+        btn.textContent = 'Use GPS';
+      },
+      ()=>{
+        btn.textContent = 'Use GPS';
+        alert('Could not get your location — you can type it in manually instead.');
+      }
+    );
+  });
+
+  // ---- time formatting ----
+  function timeAgo(ts){
+    const diff = Date.now() - ts;
+    const mins = Math.floor(diff/60000);
+    if(mins < 1) return 'just now';
+    if(mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins/60);
+    if(hrs < 24) return `${hrs}h ago`;
+    return `${Math.floor(hrs/24)}d ago`;
+  }
+
+  // ---- render feed + gauge + stats ----
+  async function loadReports(){
+    try{
+      const snap = await getDocs(query(reportsCol, orderBy("ts","desc")));
+      return snap.docs.map(d => ({ id:d.id, ...d.data() }));
+    }catch(err){
+      console.error("Firestore load failed:", err);
+      return [];
+    }
+  }
+
+  async function saveReport(report){
+    await addDoc(reportsCol, report);
+  }
+
+  function renderFeed(reports){
+    const grid = document.getElementById('feed-grid');
+    const sorted = [...reports].sort((a,b)=>b.ts-a.ts);
+    document.getElementById('feed-count').textContent = `${reports.length} report${reports.length===1?'':'s'} · shared with everyone viewing this page`;
+
+    if(sorted.length === 0){
+      grid.innerHTML = '<div class="empty-feed">No reports yet — be the first to log conditions in your area.</div>';
+    } else {
+      grid.innerHTML = sorted.map(r=>{
+        const meta = SEV_META[r.level] || SEV_META[1];
+        return `
+          <div class="report-card">
+            ${r.photo ? `<img class="report-photo" src="${r.photo}">` : ''}
+            <div class="report-body">
+              <span class="badge" style="background:${meta.color}22; color:${meta.color}; border:1px solid ${meta.color}55;">${meta.label}</span>
+              <div class="report-loc">${escapeHtml(r.location || 'Location not given')}</div>
+              ${r.desc ? `<div class="report-desc">${escapeHtml(r.desc)}</div>` : ''}
+              <div class="report-time">${escapeHtml(r.name || 'Anonymous')} · ${timeAgo(r.ts)}</div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    // stats
+    document.getElementById('stat-count').textContent = reports.length;
+    document.getElementById('stat-high').textContent = reports.filter(r=>r.level>=3).length;
+    const dayAgo = Date.now() - 24*60*60*1000;
+    document.getElementById('stat-today').textContent = reports.filter(r=>r.ts>dayAgo).length;
+
+    // gauge
+    if(reports.length){
+      const avg = reports.reduce((s,r)=>s+r.level,0)/reports.length;
+      const pct = Math.min(100, (avg/4)*100);
+      document.getElementById('gauge-water').style.height = pct+'%';
+      const nearest = SEV_META[Math.round(avg)] || SEV_META[1];
+      document.getElementById('gauge-reading-text').textContent = `~${nearest.label.toLowerCase()} (avg of ${reports.length})`;
+    }
+  }
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // ---- submit ----
+  document.getElementById('flood-form').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const status = document.getElementById('submit-status');
+    const btn = document.getElementById('submit-btn');
+    const location = document.getElementById('location-input').value.trim();
+
+    if(!location){ status.textContent = 'Add a location so people know where this is.'; return; }
+    if(!selectedLevel){ status.textContent = 'Pick a water level.'; return; }
+
+    btn.disabled = true;
+    status.textContent = 'Submitting...';
+
+    const report = {
+      id: Date.now()+'-'+Math.random().toString(36).slice(2,7),
+      ts: Date.now(),
+      location,
+      level: selectedLevel,
+      desc: document.getElementById('desc-input').value.trim(),
+      name: document.getElementById('name-input').value.trim(),
+      photo: photoDataUrl
+    };
+
+    try{
+      await saveReport(report);
+      const reports = await loadReports();
+      renderFeed(reports);
+      status.textContent = 'Report submitted — thank you.';
+      e.target.reset();
+      selectedLevel = null;
+      photoDataUrl = null;
+      document.querySelectorAll('.sev-btn').forEach(b=>b.classList.remove('active'));
+      document.getElementById('photo-preview').style.display = 'none';
+      document.getElementById('photo-placeholder').style.display = 'flex';
+    }catch(err){
+      status.textContent = 'Something went wrong — please try again.';
+    }
+    btn.disabled = false;
+    setTimeout(()=>status.textContent='', 4000);
+  });
+
+  // ---- init ----
+  (async ()=>{
+    const reports = await loadReports();
+    renderFeed(reports);
+  })();
+</script>
+
+</body>
+</html>
