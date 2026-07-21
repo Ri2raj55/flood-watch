@@ -65,6 +65,7 @@ async function exportReports() {
       level: data.level ?? null,
       desc: data.desc || "",
       name: data.name || "",
+      phone: data.phone || "",
       ts: data.ts || null,
       date: data.ts ? new Date(data.ts).toISOString() : null,
       photoFile: photoFilename,
@@ -77,9 +78,9 @@ async function exportReports() {
   );
 
   // Also write a CSV for quick viewing in Excel/Sheets
-  const csvHeader = "id,location,level,desc,name,date,photoFile\n";
+  const csvHeader = "id,location,level,desc,name,phone,date,photoFile\n";
   const csvRows = allData.map((r) =>
-    [r.id, r.location, r.level, r.desc, r.name, r.date, r.photoFile]
+    [r.id, r.location, r.level, r.desc, r.name, r.phone, r.date, r.photoFile]
       .map((v) => `"${String(v ?? "").replace(/"/g, '""')}"`)
       .join(",")
   );
@@ -88,10 +89,75 @@ async function exportReports() {
     csvHeader + csvRows.join("\n")
   );
 
+  // ---- combined report: photo + details together, one file, print-to-PDF ready ----
+  const reportHtml = buildCombinedReport(snapshot);
+  fs.writeFileSync(path.join(outDir, "combined-report.html"), reportHtml);
+
   console.log(`Done. Exported ${allData.length} reports to:`);
   console.log(`  ${path.join(outDir, "reports.json")}`);
   console.log(`  ${path.join(outDir, "reports.csv")}`);
   console.log(`  ${photosDir} (${allData.filter(r => r.photoFile).length} photos)`);
+  console.log(`  ${path.join(outDir, "combined-report.html")}  <- open this, then Ctrl+P > Save as PDF to share`);
+}
+
+function buildCombinedReport(snapshot) {
+  const SEV_LABEL = { 1: "Ankle-deep", 2: "Knee-deep", 3: "Waist-deep", 4: "Rooftop / impassable" };
+  const rows = [];
+  snapshot.forEach((doc) => {
+    const d = doc.data();
+    rows.push({
+      id: doc.id,
+      location: d.location || "Not given",
+      level: SEV_LABEL[d.level] || "Unknown",
+      desc: d.desc || "—",
+      name: d.name || "Anonymous",
+      phone: d.phone || "Not given",
+      date: d.ts ? new Date(d.ts).toLocaleString("en-IN") : "Unknown",
+      photo: d.photo || null,
+    });
+  });
+
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  const entries = rows.map((r) => `
+    <div class="entry">
+      <div class="photo-box">
+        ${r.photo ? `<img src="${r.photo}">` : `<div class="no-photo">No photo submitted</div>`}
+      </div>
+      <div class="details">
+        <div class="row"><span class="label">Location</span><span class="value">${esc(r.location)}</span></div>
+        <div class="row"><span class="label">Water level</span><span class="value">${esc(r.level)}</span></div>
+        <div class="row"><span class="label">Reported by</span><span class="value">${esc(r.name)}</span></div>
+        <div class="row"><span class="label">Phone</span><span class="value">${esc(r.phone)}</span></div>
+        <div class="row"><span class="label">Date/time</span><span class="value">${esc(r.date)}</span></div>
+        <div class="row full"><span class="label">Details</span><span class="value">${esc(r.desc)}</span></div>
+        <div class="row"><span class="label">Report ID</span><span class="value mono">${esc(r.id)}</span></div>
+      </div>
+    </div>`).join("\n");
+
+  return `<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Flood Watch — Combined Report</title>
+<style>
+  body{ font-family:Arial,sans-serif; color:#182231; margin:0; padding:32px; }
+  h1{ font-size:22px; margin-bottom:4px; }
+  .sub{ color:#5a6478; font-size:13px; margin-bottom:28px; }
+  .entry{ display:flex; gap:20px; border:1px solid #d8d0ba; border-radius:6px; padding:16px; margin-bottom:18px; page-break-inside:avoid; }
+  .photo-box{ width:220px; min-width:220px; height:165px; background:#f3efe4; border-radius:4px; overflow:hidden; display:flex; align-items:center; justify-content:center; }
+  .photo-box img{ width:100%; height:100%; object-fit:cover; }
+  .no-photo{ color:#8a8a8a; font-size:12px; }
+  .details{ flex:1; display:grid; grid-template-columns:1fr 1fr; gap:8px 20px; align-content:start; }
+  .row{ font-size:13px; }
+  .row.full{ grid-column:1/-1; }
+  .label{ display:block; text-transform:uppercase; font-size:10px; color:#8a6a44; letter-spacing:0.04em; margin-bottom:2px; }
+  .value{ color:#182231; }
+  .value.mono{ font-family:monospace; font-size:11px; color:#5a6478; }
+  @media print{ body{ padding:0; } .entry{ break-inside:avoid; } }
+</style></head>
+<body>
+  <h1>Flood Watch — Community Reports</h1>
+  <div class="sub">Combined report generated ${new Date().toLocaleString("en-IN")} · ${rows.length} report(s) · riturajborthakur.site</div>
+  ${entries || "<p>No reports found.</p>"}
+</body></html>`;
 }
 
 exportReports().catch((err) => {
