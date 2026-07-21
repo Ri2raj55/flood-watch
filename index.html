@@ -3,21 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Flood Watch — Community Reports</title>
+<title>Flood Watch — Community Flood Reporting System</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --indigo-deep:#101d33;
-    --indigo-mid:#1c2f4e;
-    --silt-brown:#8a6a44;
-    --amber:#e0a53d;
-    --alert-red:#c1443c;
-    --paper:#f3efe4;
-    --paper-dim:#e7e1d1;
-    --ink:#182231;
-    --ink-soft:#5a6478;
-    --line:#d8d0ba;
+    --navy-deep:#0b2545;
+    --navy-mid:#13315c;
+    --steel:#3c5a80;
+    --amber:#e0932a;
+    --amber-soft:#f3c47c;
+    --alert-red:#b8382f;
+    --live-green:#2ecc71;
+    --paper:#f6f6f2;
+    --paper-dim:#ececE4;
+    --card:#ffffff;
+    --ink:#141b28;
+    --ink-soft:#57657a;
+    --line:#d9d4c6;
+    --line-navy:#25406b;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   body{
@@ -26,144 +30,177 @@
     font-family:'Inter',sans-serif;
     line-height:1.5;
   }
-  .mono{ font-family:'IBM Plex Mono',monospace; letter-spacing:0.02em; }
+  .mono{ font-family:'IBM Plex Mono',monospace; letter-spacing:0.03em; }
   .display{ font-family:'Fraunces',serif; }
+  a{ color:inherit; }
+
+  /* ---------- GOV STRIP ---------- */
+  .gov-strip{
+    background:var(--navy-deep); color:#c9d3e2;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:7px 24px; font-size:10.5px; text-transform:uppercase;
+  }
+  .live-pill{ display:flex; align-items:center; gap:7px; color:#fff; font-weight:600; }
+  .live-dot{
+    width:8px; height:8px; border-radius:50%; background:var(--live-green);
+    animation:livePulse 1.7s infinite;
+  }
+  @keyframes livePulse{
+    0%{ box-shadow:0 0 0 0 rgba(46,204,113,0.65); }
+    70%{ box-shadow:0 0 0 7px rgba(46,204,113,0); }
+    100%{ box-shadow:0 0 0 0 rgba(46,204,113,0); }
+  }
 
   /* ---------- HEADER ---------- */
   header{
     position:sticky; top:0; z-index:50;
-    background:var(--indigo-deep);
-    color:var(--paper);
-    padding:14px 24px;
-    display:flex; justify-content:space-between; align-items:center;
-    border-bottom:2px solid var(--amber);
+    background:#fff;
+    border-bottom:3px solid var(--navy-deep);
+    padding:16px 24px;
+    display:flex; align-items:center; gap:14px;
   }
-  header .tag{
-    font-size:11px; text-transform:uppercase;
-    color:var(--amber);
+  .emblem{
+    width:38px; height:38px; border-radius:50%;
+    background:var(--navy-deep); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces',serif; font-weight:700; font-size:14px;
+    flex-shrink:0; border:2px solid var(--amber);
   }
-  header .brand{ font-size:15px; font-weight:600; }
+  header .brand{ font-size:16px; font-weight:700; letter-spacing:0.01em; }
+  header .tagline{ font-size:11px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.04em; }
 
   /* ---------- HERO ---------- */
   .hero{
     display:grid;
-    grid-template-columns:1.1fr 0.9fr;
-    gap:40px;
-    padding:64px 48px 56px;
-    background:linear-gradient(180deg,var(--indigo-deep) 0%, var(--indigo-mid) 100%);
-    color:var(--paper);
-    overflow:hidden;
-    position:relative;
+    grid-template-columns:1.15fr 0.85fr;
+    gap:44px;
+    padding:56px 48px 60px;
+    background:var(--paper);
+    border-bottom:1px solid var(--line);
+  }
+  .hero-copy .kicker{
+    font-size:11px; color:var(--amber); text-transform:uppercase; letter-spacing:0.08em;
+    font-weight:600; margin-bottom:14px; display:block;
   }
   .hero-copy h1{
-    font-size:clamp(34px,5vw,58px);
+    font-family:'Fraunces',serif;
+    font-size:clamp(32px,4.4vw,50px);
     font-weight:600;
-    line-height:1.05;
-    margin-bottom:18px;
+    line-height:1.08;
+    margin-bottom:16px;
+    color:var(--navy-deep);
   }
   .hero-copy h1 em{ font-style:normal; color:var(--amber); }
   .hero-copy p{
-    max-width:480px; color:#c9d1e0; font-size:16px; margin-bottom:28px;
-  }
-  .hero-copy .stats{
-    display:flex; gap:28px; margin-top:8px;
-  }
-  .hero-copy .stat b{
-    display:block; font-family:'Fraunces',serif; font-size:26px; color:var(--amber);
-  }
-  .hero-copy .stat span{
-    font-size:11px; text-transform:uppercase; color:#93a0b8; letter-spacing:0.04em;
+    max-width:480px; color:var(--ink-soft); font-size:15.5px; margin-bottom:26px;
   }
   .cta-btn{
-    background:var(--amber); color:var(--indigo-deep); border:none;
-    padding:13px 26px; font-weight:600; border-radius:3px; cursor:pointer;
-    font-size:14px; margin-top:26px;
+    background:var(--navy-deep); color:#fff; border:none;
+    padding:14px 28px; font-weight:600; border-radius:2px; cursor:pointer;
+    font-size:14px; letter-spacing:0.02em;
   }
-  .cta-btn:hover{ background:#eeb85c; }
+  .cta-btn:hover{ background:var(--navy-mid); }
 
-  /* signature: live community gauge */
-  .gauge-wrap{
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    position:relative;
+  .stat-tiles{ display:flex; gap:12px; margin-top:30px; flex-wrap:wrap; }
+  .stat-tile{
+    background:var(--card); border:1px solid var(--line); border-left:3px solid var(--navy-deep);
+    padding:12px 16px; min-width:110px;
   }
-  .gauge-label{
-    font-size:11px; text-transform:uppercase; color:#93a0b8; margin-bottom:10px; letter-spacing:0.06em;
+  .stat-tile b{ display:block; font-family:'Fraunces',serif; font-size:24px; color:var(--navy-deep); }
+  .stat-tile span{ font-size:10px; text-transform:uppercase; color:var(--ink-soft); letter-spacing:0.03em; }
+
+  /* signature: official flood gauge panel */
+  .gauge-panel{
+    background:var(--navy-deep); border:1px solid var(--line-navy);
+    padding:22px 22px 20px;
+    display:flex; flex-direction:column; align-items:center;
+  }
+  .gauge-panel .gauge-label{
+    font-size:10.5px; text-transform:uppercase; color:var(--amber-soft);
+    letter-spacing:0.06em; margin-bottom:14px; text-align:center;
   }
   .gauge{
-    width:150px; height:280px;
-    border:2px solid #3a4a68;
-    border-radius:6px;
-    position:relative;
-    overflow:hidden;
-    background:#0c1526;
+    width:130px; height:250px;
+    border:2px solid var(--line-navy);
+    position:relative; overflow:hidden;
+    background:#081a33;
   }
   .gauge-water{
     position:absolute; bottom:0; left:0; width:100%;
-    background:linear-gradient(180deg, #4a6fa5 0%, var(--silt-brown) 100%);
+    background:linear-gradient(180deg, #4d7cb8 0%, var(--amber) 100%);
     transition:height 1.2s ease;
     height:8%;
   }
   .gauge-water::before{
     content:''; position:absolute; top:-6px; left:0; width:200%; height:12px;
-    background:repeating-linear-gradient(90deg, rgba(255,255,255,0.25) 0 20px, transparent 20px 40px);
+    background:repeating-linear-gradient(90deg, rgba(255,255,255,0.28) 0 20px, transparent 20px 40px);
     animation:wave 3s linear infinite;
   }
   @keyframes wave{ from{transform:translateX(0);} to{transform:translateX(-40px);} }
   .gauge-ticks{
     position:absolute; inset:0; display:flex; flex-direction:column; justify-content:space-between;
-    padding:10px 0;
+    padding:9px 0;
   }
   .gauge-ticks div{
-    border-top:1px dashed #2c3b58; font-size:9px; color:#5f6f8f; padding-left:6px;
-    font-family:'IBM Plex Mono',monospace;
+    border-top:1px dashed #2c4d78; font-size:8.5px; color:#7f96bd; padding-left:6px;
+    font-family:'IBM Plex Mono',monospace; text-transform:uppercase;
   }
   .gauge-reading{
-    margin-top:12px; font-size:13px; color:var(--paper); text-align:center;
+    margin-top:14px; font-size:12.5px; color:#c9d3e2; text-align:center;
   }
-  .gauge-reading b{ color:var(--amber); }
+  .gauge-reading b{ color:var(--amber-soft); }
+  .gauge-disclaimer{
+    margin-top:12px; font-size:9.5px; color:#7f96bd; text-align:center; max-width:200px; line-height:1.5;
+  }
 
   /* ---------- FORM SECTION ---------- */
   .form-section{
-    padding:60px 48px;
-    max-width:920px; margin:0 auto;
+    padding:56px 48px 64px;
+    max-width:960px; margin:0 auto;
+  }
+  .section-bar{
+    display:flex; align-items:center; gap:12px; margin-bottom:6px;
+  }
+  .section-num{
+    background:var(--navy-deep); color:#fff; font-family:'IBM Plex Mono',monospace;
+    font-size:11px; padding:3px 9px; letter-spacing:0.03em;
   }
   .section-eyebrow{
-    font-size:11px; text-transform:uppercase; color:var(--silt-brown);
-    letter-spacing:0.08em; margin-bottom:8px;
+    font-size:11px; text-transform:uppercase; color:var(--ink-soft);
+    letter-spacing:0.06em; font-weight:600;
   }
   .section-title{
-    font-family:'Fraunces',serif; font-size:30px; margin-bottom:6px; font-weight:600;
+    font-family:'Fraunces',serif; font-size:28px; margin:10px 0 6px; font-weight:600; color:var(--navy-deep);
   }
-  .section-sub{ color:var(--ink-soft); margin-bottom:32px; font-size:14.5px; max-width:560px; }
+  .section-sub{ color:var(--ink-soft); margin-bottom:28px; font-size:14.5px; max-width:580px; }
 
   form{
-    background:#fff; border:1px solid var(--line); border-radius:6px; padding:32px;
+    background:var(--card); border:1px solid var(--line); border-top:3px solid var(--navy-deep); padding:32px;
   }
   .form-grid{
-    display:grid; grid-template-columns:1fr 1fr; gap:24px;
+    display:grid; grid-template-columns:1fr 1fr; gap:22px;
   }
-  .field{ display:flex; flex-direction:column; gap:8px; }
+  .field{ display:flex; flex-direction:column; gap:7px; }
   .field.full{ grid-column:1/-1; }
-  label{ font-size:12px; text-transform:uppercase; letter-spacing:0.04em; color:var(--ink-soft); font-weight:600; }
-  input[type=text], textarea{
-    border:1px solid var(--line); border-radius:4px; padding:11px 12px;
+  label{ font-size:11.5px; text-transform:uppercase; letter-spacing:0.04em; color:var(--navy-deep); font-weight:700; }
+  input[type=text], input[type=tel], textarea{
+    border:1px solid var(--line); border-radius:2px; padding:11px 12px;
     font-family:'Inter',sans-serif; font-size:14px; background:var(--paper);
     color:var(--ink);
   }
   textarea{ resize:vertical; min-height:80px; }
-  input:focus, textarea:focus{ outline:2px solid var(--silt-brown); outline-offset:1px; }
+  input:focus, textarea:focus{ outline:2px solid var(--steel); outline-offset:1px; }
 
   .loc-row{ display:flex; gap:8px; }
   .loc-row input{ flex:1; }
   .gps-btn{
-    border:1px solid var(--silt-brown); background:none; color:var(--silt-brown);
-    border-radius:4px; padding:0 14px; font-size:12px; cursor:pointer; white-space:nowrap;
+    border:1px solid var(--navy-deep); background:none; color:var(--navy-deep);
+    border-radius:2px; padding:0 14px; font-size:12px; cursor:pointer; white-space:nowrap; font-weight:600;
   }
-  .gps-btn:hover{ background:var(--silt-brown); color:#fff; }
+  .gps-btn:hover{ background:var(--navy-deep); color:#fff; }
 
-  /* photo capture tile */
   .photo-tile{
-    border:2px dashed var(--line); border-radius:6px;
+    border:2px dashed var(--line); border-radius:2px;
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     padding:22px; cursor:pointer; text-align:center; min-height:150px;
     background:var(--paper); position:relative; overflow:hidden;
@@ -173,147 +210,146 @@
   .photo-tile .icon{ font-size:26px; margin-bottom:8px; }
   .photo-tile input{ display:none; }
 
-  /* severity ruler - signature control */
   .severity-options{
     display:grid; grid-template-columns:repeat(4,1fr); gap:10px;
   }
   .sev-btn{
-    border:1px solid var(--line); border-radius:4px; background:#fff;
+    border:1px solid var(--line); border-radius:2px; background:#fff;
     padding:12px 6px 10px; cursor:pointer; text-align:center;
     display:flex; flex-direction:column; align-items:center; gap:6px;
   }
-  .sev-fill-track{ width:14px; height:34px; border:1px solid var(--line); border-radius:2px; position:relative; overflow:hidden; background:var(--paper-dim);}
+  .sev-fill-track{ width:14px; height:34px; border:1px solid var(--line); border-radius:1px; position:relative; overflow:hidden; background:var(--paper-dim);}
   .sev-fill{ position:absolute; bottom:0; left:0; width:100%; }
   .sev-btn span{ font-size:10.5px; color:var(--ink-soft); line-height:1.2; }
-  .sev-btn.active{ border-color:var(--ink); box-shadow:0 0 0 1px var(--ink); }
-  .sev-btn.active span{ color:var(--ink); font-weight:600; }
+  .sev-btn.active{ border-color:var(--navy-deep); box-shadow:0 0 0 1px var(--navy-deep); }
+  .sev-btn.active span{ color:var(--navy-deep); font-weight:700; }
 
-  .submit-row{ display:flex; justify-content:flex-end; margin-top:26px; align-items:center; gap:14px;}
+  .consent-row{ margin-top:22px; padding-top:18px; border-top:1px solid var(--line); }
+  .consent-label{ display:flex; align-items:flex-start; gap:10px; cursor:pointer; }
+  .consent-label input{ margin-top:3px; flex-shrink:0; width:15px; height:15px; accent-color:var(--navy-deep); }
+  .consent-label span{ font-size:12.5px; color:var(--ink-soft); line-height:1.5; }
+  .submit-row{ display:flex; justify-content:flex-end; margin-top:18px; align-items:center; gap:14px;}
   .submit-status{ font-size:12.5px; color:var(--ink-soft); }
   .submit-btn{
-    background:var(--indigo-deep); color:#fff; border:none; padding:13px 28px;
-    border-radius:4px; font-weight:600; cursor:pointer; font-size:14px;
+    background:var(--amber); color:var(--navy-deep); border:none; padding:13px 30px;
+    border-radius:2px; font-weight:700; cursor:pointer; font-size:14px; letter-spacing:0.02em;
   }
-  .submit-btn:hover{ background:#0b1729; }
+  .submit-btn:hover{ background:#eda43f; }
   .submit-btn:disabled{ opacity:0.5; cursor:not-allowed; }
 
   /* ---------- FEED ---------- */
   .feed-section{
-    background:var(--indigo-deep); color:var(--paper);
-    padding:56px 48px 72px;
+    background:var(--paper-dim);
+    padding:52px 48px 64px;
+    border-top:1px solid var(--line); border-bottom:1px solid var(--line);
   }
-  .feed-header{ max-width:920px; margin:0 auto 30px; display:flex; justify-content:space-between; align-items:flex-end;}
-  .feed-header .section-title{ color:var(--paper); }
-  .feed-header .section-eyebrow{ color:var(--amber); }
-  .feed-count{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:#93a0b8; }
+  .feed-wrap{ max-width:960px; margin:0 auto; }
+  .feed-header{ display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:26px; flex-wrap:wrap; gap:10px;}
+  .feed-count{ font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-soft); }
 
   .feed-grid{
-    max-width:920px; margin:0 auto;
-    display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:18px;
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px;
   }
   .report-card{
-    background:var(--indigo-mid); border:1px solid #2c3b58; border-radius:6px; overflow:hidden;
+    background:var(--card); border:1px solid var(--line); border-left:3px solid var(--steel); overflow:hidden;
   }
-  .report-photo{ width:100%; height:150px; object-fit:cover; display:block; background:#0c1526; }
+  .report-photo{ width:100%; height:150px; object-fit:cover; display:block; background:var(--paper-dim); }
   .report-body{ padding:14px 16px 16px; }
   .badge{
-    display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:10.5px;
-    padding:3px 8px; border-radius:20px; text-transform:uppercase; margin-bottom:8px;
+    display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:10px;
+    padding:3px 8px; text-transform:uppercase; margin-bottom:8px; border-radius:2px;
   }
-  .report-loc{ font-size:13.5px; font-weight:600; margin-bottom:4px; }
-  .report-desc{ font-size:12.5px; color:#a9b3c6; margin-bottom:10px; line-height:1.5;}
-  .report-time{ font-size:10.5px; color:#697590; font-family:'IBM Plex Mono',monospace;}
-  .empty-feed{ color:#93a0b8; font-size:13.5px; grid-column:1/-1; text-align:center; padding:40px 0;}
+  .report-loc{ font-size:13.5px; font-weight:700; margin-bottom:4px; color:var(--navy-deep); }
+  .report-desc{ font-size:12.5px; color:var(--ink-soft); margin-bottom:10px; line-height:1.5;}
+  .report-time{ font-size:10.5px; color:#8a93a3; font-family:'IBM Plex Mono',monospace;}
+  .empty-feed{ color:var(--ink-soft); font-size:13.5px; grid-column:1/-1; text-align:center; padding:40px 0;}
 
-  /* ---------- IDEAS FOOTER ---------- */
-  footer{
-    padding:40px 48px; background:var(--paper); border-top:1px solid var(--line);
-  }
-  .support{
-    max-width:920px; margin:0 auto;
-  }
+  /* ---------- FOOTER ---------- */
+  footer{ padding:44px 48px 32px; background:var(--paper); }
+  .support{ max-width:960px; margin:0 auto; }
   .support .section-eyebrow{ margin-bottom:4px; }
-  .support-copy{ color:var(--ink-soft); font-size:14px; max-width:540px; margin:10px 0 20px; line-height:1.6; }
+  .support-copy{ color:var(--ink-soft); font-size:14px; max-width:560px; margin:10px 0 20px; line-height:1.6; }
   .donate-block{ display:flex; align-items:center; gap:24px; flex-wrap:wrap; }
   .upi-apps{ display:flex; gap:10px; flex-wrap:wrap; }
   .upi-app-btn{
-    display:inline-block; background:var(--amber); color:var(--indigo-deep);
-    text-decoration:none; font-weight:600; font-size:13.5px;
-    padding:11px 18px; border-radius:4px;
+    display:inline-block; background:var(--navy-deep); color:#fff;
+    text-decoration:none; font-weight:700; font-size:13.5px;
+    padding:12px 22px; border-radius:2px;
   }
-  .upi-app-btn:hover{ background:#eeb85c; }
-  .upi-app-btn-generic{ background:none; border:1px solid var(--silt-brown); color:var(--silt-brown); }
-  .upi-app-btn-generic:hover{ background:var(--silt-brown); color:#fff; }
+  .upi-app-btn:hover{ background:var(--navy-mid); }
   .donate-qr{ display:flex; flex-direction:column; align-items:center; gap:6px; }
-  .donate-qr img{ border:1px solid var(--line); border-radius:4px; background:#fff; padding:6px; }
+  .donate-qr img{ border:1px solid var(--line); border-radius:2px; background:#fff; padding:6px; }
   .donate-qr span{ font-size:11px; color:var(--ink-soft); }
-  .donate-alt{ margin-top:16px; font-size:13px; color:var(--ink-soft); }
-  .donate-alt b{ color:var(--ink); }
+
+  .disclaimer{
+    max-width:960px; margin:36px auto 0; padding:14px 16px;
+    background:#fff; border:1px solid var(--line); border-left:3px solid var(--amber);
+    font-size:11.5px; color:var(--ink-soft); line-height:1.6;
+  }
   .copyright{
-    max-width:920px; margin:36px auto 0; padding-top:20px;
+    max-width:960px; margin:20px auto 0; padding-top:18px;
     border-top:1px solid var(--line); font-size:11px; color:var(--ink-soft);
     text-align:center;
   }
+  .copyright a{ color:var(--navy-deep); text-decoration:none; font-weight:600; }
+  .copyright a:hover{ text-decoration:underline; }
 
   @media (max-width:760px){
-    .hero{ grid-template-columns:1fr; padding:40px 20px; gap:32px; }
-    .hero-copy .stats{ flex-wrap:wrap; row-gap:16px; }
+    header{ padding:13px 18px; }
+    .gov-strip{ padding:6px 16px; font-size:9.5px; }
+    .hero{ grid-template-columns:1fr; padding:36px 20px; gap:30px; }
+    .stat-tiles{ gap:10px; }
     .form-section, .feed-section, footer{ padding-left:20px; padding-right:20px; }
-    .form-section{ padding-top:44px; padding-bottom:44px; }
-    .feed-section{ padding-top:44px; padding-bottom:52px; }
-    form{ padding:22px; }
-    .form-grid{ grid-template-columns:1fr; gap:18px; }
+    .form-section{ padding-top:40px; padding-bottom:40px; }
+    .feed-section{ padding-top:40px; padding-bottom:48px; }
+    form{ padding:20px; }
+    .form-grid{ grid-template-columns:1fr; gap:16px; }
     .severity-options{ grid-template-columns:repeat(2,1fr); }
     .submit-row{ flex-direction:column; align-items:stretch; gap:10px; }
     .submit-btn{ width:100%; }
-    header{ padding:12px 18px;}
-    .gauge{ width:120px; height:220px; }
-    .feed-header{ flex-direction:column; align-items:flex-start; gap:8px; }
+    .gauge{ width:110px; height:210px; }
+    .feed-header{ flex-direction:column; align-items:flex-start; }
     .feed-grid{ grid-template-columns:1fr; }
   }
 
   @media (max-width:420px){
-    .hero-copy h1{ font-size:30px; }
-    .hero-copy .stats{ gap:20px; }
-    .section-title{ font-size:24px; }
+    .hero-copy h1{ font-size:28px; }
+    .section-title{ font-size:22px; }
     .severity-options{ grid-template-columns:1fr 1fr; gap:8px; }
     .sev-btn{ padding:10px 4px 8px; }
     .loc-row{ flex-direction:column; align-items:stretch; }
     .gps-btn{ padding:10px 0; }
   }
-.copyright a {
-    color: inherit;
-    text-decoration: none;
-}
-
-.copyright a:hover {
-    text-decoration: underline;
-}
-
 </style>
 </head>
 <body>
 
+<div class="gov-strip mono">
+  <span>Community Flood Reporting System &middot; Assam</span>
+  <span class="live-pill"><span class="live-dot"></span>LIVE</span>
+</div>
+
 <header>
+  <div class="emblem display">FW</div>
   <div>
     <div class="brand">FLOOD WATCH</div>
-    <div class="tag mono">Assam · community reporting</div>
+    <div class="tagline">Real-time community flood reporting for Assam</div>
   </div>
-  <div class="tag mono" id="clock-tag">LIVE</div>
 </header>
 
 <section class="hero">
   <div class="hero-copy">
+    <span class="kicker mono">Situational awareness · updated live</span>
     <h1>When the water<br>rises, <em>report it</em><br>before it spreads.</h1>
-    <p>A snap of your street corner tells the next family more than any bulletin. Add a photo, mark the water level, and it joins the live community map below — no login, no waiting on the municipal office.</p>
+    <p>A photo from your street corner tells the next family — and the next responder — more than any bulletin. Log the water level and it joins the live record below, visible to anyone checking conditions in your area.</p>
     <button class="cta-btn" onclick="document.getElementById('report-form').scrollIntoView({behavior:'smooth'})">Report flooding near you</button>
-    <div class="stats">
-      <div class="stat"><b id="stat-count">0</b><span>Reports logged</span></div>
-      <div class="stat"><b id="stat-high">0</b><span>Waist-deep or worse</span></div>
-      <div class="stat"><b id="stat-today">0</b><span>In the last 24h</span></div>
+    <div class="stat-tiles">
+      <div class="stat-tile"><b id="stat-count">0</b><span>Reports logged</span></div>
+      <div class="stat-tile"><b id="stat-high">0</b><span>Waist-deep or worse</span></div>
+      <div class="stat-tile"><b id="stat-today">0</b><span>Last 24 hours</span></div>
     </div>
   </div>
-  <div class="gauge-wrap">
+  <div class="gauge-panel">
     <div class="gauge-label mono">Community water gauge</div>
     <div class="gauge">
       <div class="gauge-ticks">
@@ -322,11 +358,12 @@
       <div class="gauge-water" id="gauge-water"></div>
     </div>
     <div class="gauge-reading">Average reported level: <b id="gauge-reading-text">no data yet</b></div>
+    <div class="gauge-disclaimer">Indicative average of self-reported submissions — not an official river gauge reading.</div>
   </div>
 </section>
 
 <section class="form-section" id="report-form">
-  <div class="section-eyebrow mono">01 — submit a report</div>
+  <div class="section-bar"><span class="section-num mono">SECTION 01</span><span class="section-eyebrow">Submit a report</span></div>
   <div class="section-title">What's happening at your location?</div>
   <div class="section-sub">Take a photo where you're standing, mark how deep the water is, and add anything nearby residents should know — a blocked road, a weak embankment, a stranded vehicle.</div>
 
@@ -367,19 +404,19 @@
         <label>Water level</label>
         <div class="severity-options" id="severity-options">
           <button type="button" class="sev-btn" data-level="1" data-label="Ankle-deep">
-            <div class="sev-fill-track"><div class="sev-fill" style="height:20%;background:#7fae6a;"></div></div>
+            <div class="sev-fill-track"><div class="sev-fill" style="height:20%;background:#4f8f63;"></div></div>
             <span>Ankle-deep</span>
           </button>
           <button type="button" class="sev-btn" data-level="2" data-label="Knee-deep">
-            <div class="sev-fill-track"><div class="sev-fill" style="height:45%;background:#e0a53d;"></div></div>
+            <div class="sev-fill-track"><div class="sev-fill" style="height:45%;background:#e0932a;"></div></div>
             <span>Knee-deep</span>
           </button>
           <button type="button" class="sev-btn" data-level="3" data-label="Waist-deep">
-            <div class="sev-fill-track"><div class="sev-fill" style="height:70%;background:#c1443c;"></div></div>
+            <div class="sev-fill-track"><div class="sev-fill" style="height:70%;background:#b8382f;"></div></div>
             <span>Waist-deep</span>
           </button>
           <button type="button" class="sev-btn" data-level="4" data-label="Rooftop / impassable">
-            <div class="sev-fill-track"><div class="sev-fill" style="height:95%;background:#7a1f1a;"></div></div>
+            <div class="sev-fill-track"><div class="sev-fill" style="height:95%;background:#6e1a16;"></div></div>
             <span>Rooftop / impassable</span>
           </button>
         </div>
@@ -391,6 +428,13 @@
       </div>
     </div>
 
+    <div class="consent-row">
+      <label class="consent-label">
+        <input type="checkbox" id="consent-check" required>
+        <span>I understand this report — including my photo, name, and phone number if provided — may be shown publicly on this page and shared with local authorities for flood response.</span>
+      </label>
+    </div>
+
     <div class="submit-row">
       <div class="submit-status" id="submit-status"></div>
       <button type="submit" class="submit-btn" id="submit-btn">Submit report</button>
@@ -399,48 +443,51 @@
 </section>
 
 <section class="feed-section">
-  <div class="feed-header">
-    <div>
-      <div class="section-eyebrow mono">02 — live feed</div>
-      <div class="section-title">Reports from your neighbours</div>
+  <div class="feed-wrap">
+    <div class="feed-header">
+      <div>
+        <div class="section-bar"><span class="section-num mono">SECTION 02</span><span class="section-eyebrow">Live log</span></div>
+        <div class="section-title" style="margin-bottom:0;">Reports from your neighbours</div>
+      </div>
+      <div class="feed-count mono" id="feed-count">0 reports · shared with everyone viewing this page</div>
     </div>
-    <div class="feed-count mono" id="feed-count">0 reports · shared with everyone viewing this page</div>
-  </div>
-  <div class="feed-grid" id="feed-grid">
-    <div class="empty-feed" id="empty-feed">No reports yet — be the first to log conditions in your area.</div>
+    <div class="feed-grid" id="feed-grid">
+      <div class="empty-feed" id="empty-feed">No reports yet — be the first to log conditions in your area.</div>
+    </div>
   </div>
 </section>
 
 <footer>
   <div class="support">
-    <div class="section-eyebrow mono">keep this running</div>
+    <div class="section-bar"><span class="section-num mono">SECTION 03</span><span class="section-eyebrow">Keep this running</span></div>
     <div class="section-title" style="font-size:22px;">Support Flood Watch</div>
     <p class="support-copy">This page is free for anyone in a flood-affected area to use — no login, no ads. If it's helped you or someone you know, a small contribution helps keep it online and growing.</p>
     <div class="donate-block">
       <div class="upi-apps">
-        <a href="upi://pay?pa=8402801613@superyes&pn=Rituraj%20Borthakur&cu=INR" class="upi-app-btn upi-app-btn-generic">Pay with UPI (choose app)</a>
+        <a href="upi://pay?pa=8402801613@superyes&pn=Rituraj%20Borthakur&cu=INR" class="upi-app-btn">Pay with UPI (choose app)</a>
       </div>
       <div class="donate-qr">
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=upi%3A%2F%2Fpay%3Fpa%3D8402801613%40superyes%26pn%3DRituraj%2520Borthakur%26cu%3DINR" alt="UPI QR code" width="140" height="140">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi%3A%2F%2Fpay%3Fpa%3D8402801613%40superyes%26pn%3DRituraj%2520Borthakur%26cu%3DINR" alt="UPI QR code" width="130" height="130">
         <span>Scan to pay</span>
       </div>
     </div>
-    
   </div>
- <div class="copyright mono">
-  © <span id="year"></span>
-  <a href="https://riturajborthakur.site" target="_blank" rel="noopener noreferrer">
-    riturajborthakur.site
-  </a>
-  — made with love, for helping.
-</div>
+
+  <div class="disclaimer">
+    <b>Note on data:</b> All reports on this page are submitted directly by members of the public and are not independently verified by any government agency. They are intended to support situational awareness during flood events and should not be treated as an official advisory or measurement.
+    <br><br>
+    <b>Report a problem:</b> If you spot a fake, abusive, or spam report, contact <a href="mailto:riturajborthakur5@gmail.com" style="text-decoration:underline;">riturajborthakur5@gmail.com</a> and it will be reviewed.
+  </div>
+
+  <div class="copyright mono">
+    &copy; <span id="year"></span>
+    <a href="https://riturajborthakur.site" target="_blank" rel="noopener noreferrer">riturajborthakur.site</a>
+    — made with love, for helping.
+  </div>
 </footer>
 
 <script type="module">
   // ===== FIREBASE SETUP =====
-  // 1. Create a project at https://console.firebase.google.com
-  // 2. Enable Firestore Database (start in test mode)
-  // 3. Project settings > Your apps > Web app > copy the config below
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -459,12 +506,11 @@
   const reportsCol = collection(db, "flood-reports");
 
   const SEV_META = {
-    1: {label:'Ankle-deep', color:'#7fae6a'},
-    2: {label:'Knee-deep', color:'#e0a53d'},
-    3: {label:'Waist-deep', color:'#c1443c'},
-    4: {label:'Rooftop / impassable', color:'#7a1f1a'}
+    1: {label:'Ankle-deep', color:'#4f8f63'},
+    2: {label:'Knee-deep', color:'#e0932a'},
+    3: {label:'Waist-deep', color:'#b8382f'},
+    4: {label:'Rooftop / impassable', color:'#6e1a16'}
   };
-  const STORAGE_KEY = 'flood-reports';
 
   let selectedLevel = null;
   let photoDataUrl = null;
@@ -524,7 +570,6 @@
           const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=17&addressdetails=1`);
           const data = await res.json();
           if(data && data.display_name){
-            // shorten to the first few meaningful parts (locality, area, district)
             const parts = data.display_name.split(',').map(p=>p.trim());
             const short = parts.slice(0, 4).join(', ');
             locInput.value = short;
@@ -532,7 +577,6 @@
             locInput.value = `${lat}, ${lng}`;
           }
         }catch(err){
-          // fallback to coordinates if the address lookup fails or is offline
           locInput.value = `${lat}, ${lng}`;
         }
         btn.textContent = 'Use GPS';
@@ -593,13 +637,11 @@
       }).join('');
     }
 
-    // stats
     document.getElementById('stat-count').textContent = reports.length;
     document.getElementById('stat-high').textContent = reports.filter(r=>r.level>=3).length;
     const dayAgo = Date.now() - 24*60*60*1000;
     document.getElementById('stat-today').textContent = reports.filter(r=>r.ts>dayAgo).length;
 
-    // gauge
     if(reports.length){
       const avg = reports.reduce((s,r)=>s+r.level,0)/reports.length;
       const pct = Math.min(100, (avg/4)*100);
@@ -624,6 +666,7 @@
 
     if(!location){ status.textContent = 'Add a location so people know where this is.'; return; }
     if(!selectedLevel){ status.textContent = 'Pick a water level.'; return; }
+    if(!document.getElementById('consent-check').checked){ status.textContent = 'Please confirm the consent checkbox to submit.'; return; }
 
     btn.disabled = true;
     status.textContent = 'Submitting...';
